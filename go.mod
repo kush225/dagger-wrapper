@@ -1,4 +1,4 @@
-module github.com:kush225/dagger-wrapper
+module github.com/kush225/dagger-wrapper
 
 go 1.22.5
 
