@@ -1,0 +1,4 @@
+include:
+  - project: doubleverify/devops/ci-cd/gitlab-ci
+    file: common.yml
+    ref: $DV_CI_LIBGITLABCI_VER
