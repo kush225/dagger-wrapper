@@ -8,7 +8,7 @@ import (
 	"dagger.io/dagger"
 	"gopkg.in/yaml.v3"
 
-	"gitlab.com/doubleverify/devops/tests-projects/devops-cicd/ci-2.0/dagger-wrapper/secrets"
+	"github.com/kush225/dagger-wrapper/secrets"
 )
 
 type Config struct {
