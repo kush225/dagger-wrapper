@@ -20,7 +20,9 @@ type Config struct {
 		SourceDirectory string            `yaml:"source_directory"`
 		Secrets         map[string]string `yaml:"secrets"`
 		Commands        [][]string        `yaml:"commands"`
+		EnvVariable		map[string]string `yaml:"variables"`
 	} `yaml:"steps"`
+	EnvVariable		map[string]string `yaml:"variables"`
 }
 
 func main() {
@@ -71,12 +73,20 @@ func runSteps(ctx context.Context, config *Config) error {
 			From(step.BaseImage).
 			WithWorkdir(step.Workdir)
 
+		for name, value := range config.EnvVariable{
+			container = container.WithEnvVariable(name, value)
+		}
+	
 		if step.SourceDirectory != "" {
 			sourceDir := client.Host().Directory(step.SourceDirectory)
 			container = container.WithDirectory(step.Workdir, sourceDir)
 		}
 
 		for name, value := range secretsMap {
+			container = container.WithEnvVariable(name, value)
+		}
+
+		for name, value := range step.EnvVariable{
 			container = container.WithEnvVariable(name, value)
 		}
 

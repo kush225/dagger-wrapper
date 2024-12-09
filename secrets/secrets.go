@@ -7,7 +7,20 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 )
+
+func SplitPathKey(input string) (string, string, error) {
+	lastSlashIndex := strings.LastIndex(input, "/")
+	if lastSlashIndex == -1 {
+		return "", "", fmt.Errorf("invalid input string, no '/' found")
+	}
+
+	path := input[:lastSlashIndex]
+	key := input[lastSlashIndex+1:]
+
+	return path, key, nil
+}
 
 func FetchSecrets(ctx context.Context, secretsConfig map[string]string) (map[string]string, error) {
 	secrets := make(map[string]string)
@@ -18,9 +31,16 @@ func FetchSecrets(ctx context.Context, secretsConfig map[string]string) (map[str
 	if token == "" {
 		return nil, fmt.Errorf("VAULT_TOKEN environment variable is not set")
 	}
+	secrets["VAULT_TOKEN"] = token
 
 	for name, path := range secretsConfig {
-		req, err := http.NewRequestWithContext(ctx, "GET", fmt.Sprintf(vaultURL, path), nil)
+
+		key_path, key, err := SplitPathKey(path)
+		if err != nil {
+			return nil, err
+		}
+
+		req, err := http.NewRequestWithContext(ctx, "GET", fmt.Sprintf(vaultURL, key_path), nil)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create request for secret %s: %w", name, err)
 		}
@@ -52,12 +72,13 @@ func FetchSecrets(ctx context.Context, secretsConfig map[string]string) (map[str
 			return nil, fmt.Errorf("failed to parse response for secret %s: %w", name, err)
 		}
 
-		secretValue, ok := secretData.Data.Data[name]
+		secretValue, ok := secretData.Data.Data[key]
 		if !ok {
-			return nil, fmt.Errorf("secret %s not found in response", name)
+			return nil, fmt.Errorf("secret %s not found in response", key)
 		}
 		secrets[name] = fmt.Sprintf("%s", secretValue)
 	}
+	
 
 	return secrets, nil
 }

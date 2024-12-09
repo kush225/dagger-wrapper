@@ -1,0 +1,24 @@
+include:
+  - project: doubleverify/devops/ci-cd/gitlab-ci
+    file: common.yml
+    ref: $DV_CI_LIBGITLABCI_VER
+  - project: doubleverify/devops/ci-cd/gitlab-ci
+    file: docker.yml
+
+stages:
+  - build
+
+
+services:
+  - docker:19.03.0-dind
+
+.dagger_run:
+  stage: build
+  extends: .dv.docker._base
+
+  script:
+    - !reference [.dv.docker._ref, docker_init]
+    - curl -fsSL https://go.dev/dl/go1.22.10.linux-amd64.tar.gz | tar -C /usr/local -xzf -
+    - PATH="/usr/local/go/bin:${PATH}"
+    - export VAULT_TOKEN=${vault_token_custom}
+    - go run github.com/kush225/dagger-wrapper@v1.0.2
