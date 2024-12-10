@@ -12,14 +12,14 @@ import (
 )
 
 type Config struct {
-	SetupCommands [][]string `yaml:"setup_commands"`
+	SetupCommands []string `yaml:"setup_commands"`
 	Steps []struct {
 		Name            string            `yaml:"name"`
 		BaseImage       string            `yaml:"base_image"`
 		Workdir         string            `yaml:"workdir"`
 		SourceDirectory string            `yaml:"source_directory"`
 		Secrets         map[string]string `yaml:"secrets"`
-		Commands        [][]string        `yaml:"commands"`
+		Commands        []string        `yaml:"commands"`
 		EnvVariable		map[string]string `yaml:"variables"`
 	} `yaml:"steps"`
 	EnvVariable		map[string]string `yaml:"variables"`
@@ -91,11 +91,11 @@ func runSteps(ctx context.Context, config *Config) error {
 		}
 
 		for _, cmd := range config.SetupCommands {
-			container = container.WithExec(cmd)
+			container = container.WithExec([]string{"sh", "-c", cmd})
 		}
 
 		for _, cmd := range step.Commands {
-			container = container.WithExec(cmd)
+			container = container.WithExec([]string{"sh", "-c", cmd})
 		}
 
 		if _, err := container.ExitCode(ctx); err != nil {

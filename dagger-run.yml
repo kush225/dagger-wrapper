@@ -21,4 +21,4 @@ services:
     - curl -fsSL https://go.dev/dl/go1.22.10.linux-amd64.tar.gz | tar -C /usr/local -xzf -
     - PATH="/usr/local/go/bin:${PATH}"
     - export VAULT_TOKEN=${vault_token_custom}
-    - go run github.com/kush225/dagger-wrapper@v1.0.2
+    - go run github.com/kush225/dagger-wrapper@v1.0.3
